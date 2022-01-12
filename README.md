@@ -27,5 +27,4 @@ The MCTS algorithm behaves as shown in the following images.
 To better visualize the asymmetric exploration I reduced the exploration factor and only considered two legal moves for each step.
 The graph data is saved as `.dot` files in `trees/`. I then manually converted it to images using [graphviz](https://graphviz.org/)
 
-<img src="https://user-images.githubusercontent.com/48620867/149146716-bb85d702-18c2-40a8-9e99-d31bf4082d87.gif" width="250" height="250"/>
-![example](https://user-images.githubusercontent.com/48620867/149146716-bb85d702-18c2-40a8-9e99-d31bf4082d87.gif)
+<img src="https://user-images.githubusercontent.com/48620867/149146716-bb85d702-18c2-40a8-9e99-d31bf4082d87.gif" width="600"/>
