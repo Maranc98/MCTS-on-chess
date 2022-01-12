@@ -22,9 +22,36 @@ move = solver.get_best_move(steps=1000, max_time=10)
 solver.add_move(move)
 ```
 
+After the time or steps cap is reached, the algorithm chooses which move to take.
+The script in `mcts.py` then makes the move on an external gym-chess environment and prints the resulting board.
+The opponent then makes its move, and the script visualizes the new board.
+This process can be repeated until game completion.
+
+This is an example output of a MCTS step followed by a step from the opponent.
+```
+♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
+⭘ ⭘ ⭘ ⭘ ⭘ ⭘ ⭘ ⭘
+⭘ ⭘ ⭘ ⭘ ⭘ ⭘ ⭘ ⭘
+⭘ ⭘ ⭘ ⭘ ⭘ ♙ ⭘ ⭘
+⭘ ⭘ ⭘ ⭘ ⭘ ⭘ ⭘ ⭘
+♙ ♙ ♙ ♙ ♙ ⭘ ♙ ♙
+♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖ 
+
+♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+♟ ♟ ♟ ♟ ♟ ⭘ ♟ ♟
+⭘ ⭘ ⭘ ⭘ ⭘ ⭘ ⭘ ⭘
+⭘ ⭘ ⭘ ⭘ ⭘ ♟ ⭘ ⭘
+⭘ ⭘ ⭘ ⭘ ⭘ ♙ ⭘ ⭘
+⭘ ⭘ ⭘ ⭘ ⭘ ⭘ ⭘ ⭘
+♙ ♙ ♙ ♙ ♙ ⭘ ♙ ♙
+♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
+```
+
 ### Behaviour
 The MCTS algorithm behaves as shown in the following images. 
 To better visualize the asymmetric exploration I reduced the exploration factor and only considered two legal moves for each step.
 The graph data is saved as `.dot` files in `trees/` through the `save_tree` argument of the `MCTS` object. I then manually converted it to images using [graphviz](https://graphviz.org/).
 
 <img src="https://user-images.githubusercontent.com/48620867/149146716-bb85d702-18c2-40a8-9e99-d31bf4082d87.gif" height="400"/>
+
