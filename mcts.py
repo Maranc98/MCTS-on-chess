@@ -5,22 +5,35 @@ from anytree.exporter import DotExporter
 import numpy as np
 import random
 import time
+from copy import deepcopy
+from players.stockfish_player import StockfishPlayer
+
+from rollout_functions import RandomRollout, BoardEval
+from players import RandomPlayer, StockfishPlayer
+from models import BoardScoreGenerator
 
 class MCTS():
     def __init__(
         self,
-        env,
+        rollout_fn=None,
         show_text=False,
         show_tree=False,
         save_tree=False,
         exploration_c=2,
+        max_steps=1000,
+        max_time=10,
         ):
 
-        self.env = env
+        self.s0 = None
+        self.env = None
+        self.rollout_fn = rollout_fn if rollout_fn is not None else RandomRollout()
+
         self.show_text = show_text
         self.show_tree = show_tree
         self.save_tree = save_tree
         self.exploration_c = exploration_c
+        self.max_steps = max_steps
+        self.max_time = max_time
 
         self.tree = at.Node("S0", t=0, n=0)
         self.curr_node = self.tree
@@ -32,6 +45,7 @@ class MCTS():
         self.curr_node = self.tree
         self.reset_env()
 
+        # Get UCB1 scores for children nodes and go down the best UCB1 until leaf
         while self.curr_node.children:
             scores = [self.ucb1(child) for child in self.curr_node.children]
             self.set_curr_node(np.argmax(scores))
@@ -66,17 +80,10 @@ class MCTS():
         self.env.step(self.curr_node.opponent_action)
 
     def rollout(self):
-        done = False
-        for i in range(1000):
-            self.env.render()
-            move = random.choice(self.env.legal_moves)
-            observation, reward, done, info = self.env.step(move)
-            if done:
-                break
-        self.env.close()
+        reward = self.rollout_fn(self.env)
 
         if self.show_text:
-            print(f"MAX STEPS: {i} got {reward}")
+            print(f"Reward {reward}")
         return reward
 
     def backpropagate(self, v):
@@ -95,17 +102,20 @@ class MCTS():
         exploration_score = np.sqrt(np.log(self.tree.n) / node.n)
         return reward_avg + self.exploration_c * exploration_score
 
-    def reset_env(self):
-        self.env.reset()
-        for move in self.moves_log:
-            self.env.step(move)
+    def set_state(self, state):
+        del self.s0
+        self.tree = at.Node("S0", t=0, n=0)
+        self.s0 = deepcopy(state)
 
-    def get_best_move(self, steps=None, max_time=None):
-        steps = steps if steps is not None else 1000
+    def reset_env(self):
+        del self.env
+        self.env = deepcopy(self.s0)
+
+    def get_best_move(self):
         t0 = time.time()
-        for i in range(steps):
+        for i in range(self.max_steps):
             self.step()
-            if max_time is not None and (time.time() - t0) > max_time:
+            if self.max_time is not None and (time.time() - t0) > self.max_time:
                 break
 
         # Choose best action as the action with the most simulations
@@ -125,18 +135,27 @@ class MCTS():
         self.node_counter = 0
 
 if __name__ == "__main__":
-    solver = MCTS(gym.make('Chess-v0'), show_tree=False, show_text=False, save_tree=False)
+    player1 = MCTS(
+        #rollout_fn=RandomRollout(repeat_n=2),
+        rollout_fn=BoardEval(BoardScoreGenerator, 'ckpts/eval_model.ckpt'),
+        max_steps=1000,
+        max_time=5,
+        show_tree=False,
+        show_text=False,
+        save_tree=False,
+    )
 
-    outside_env = gym.make('Chess-v0')
-    outside_env.reset()
+    #player2 = RandomPlayer()
+    player2 = StockfishPlayer()
+    players = [player1, player2]
+
+    env = gym.make('Chess-v0')
+    env.reset()
 
     for i in range(10):
-        move = solver.get_best_move(steps=1000, max_time=10)
-        outside_env.step(move)
-        solver.add_move(move)
-        print(outside_env.render(), "\n")
-
-        opponent_move = random.choice(outside_env.legal_moves)
-        outside_env.step(opponent_move)
-        solver.add_move(opponent_move)
-        print(outside_env.render(), "\n\n")
+        for player in players:
+            player.set_state(env)
+            move = player.get_best_move()
+            print(move)
+            env.step(move)
+            print(env.render(), "\n")
