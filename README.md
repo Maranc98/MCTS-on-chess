@@ -6,7 +6,7 @@ The code was tested on python 3.9.
 * Gym: `pip install gym`  
 * Gym chess: `pip install gym-chess`
 * Anytree: `pip install anytree` to build the MCTS tree and display it
-* Pytorch: Go here to learn how to install the correct version for your environment.
+* Pytorch: Go [here](https://pytorch.org/get-started/locally/) to learn how to install the correct version for your environment.
 * Pytorch-lightning: `pip install pytorch-lightning` if you want to train and use the board evaluation model
 * Stockfish: `pip install stockfish` to use the StockfishPlayer, you will also need to add stockfish binaries to its folder
 
