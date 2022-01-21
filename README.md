@@ -8,10 +8,11 @@ The code was tested on python 3.9.
 * Anytree: `pip install anytree` to build the MCTS tree and display it
 * Pytorch: Go here to learn how to install the correct version for your environment.
 * Pytorch-lightning: `pip install pytorch-lightning` if you want to train and use the board evaluation model
+* Stockfish: `pip install stockfish` to use the StockfishPlayer, you will also need to add stockfish binaries to its folder
 
 ### Script
-The `mcts.py` script runs the algorithm on 50 rounds of chess. 
-Player1 uses MCTS with a pre-trained CNN model to evaluate board states. The model is trained to predict Stockfish evaluations of a given board state using this [dataset]!(https://www.kaggle.com/ronakbadhe/chess-evaluations).
+The `mcts.py` script runs the algorithm on 10 rounds of chess. 
+Player1 uses MCTS with a pre-trained CNN model to evaluate board states. The model is trained on [this]!(https://www.kaggle.com/ronakbadhe/chess-evaluations) dataset to predict Stockfish evaluations of a given board state.
 Player2 uses Stockfish to choose its moves.
 Different simple players and rollout functions are defined in their respective folders. 
 They can be used with the defined MCTS interface.
@@ -31,8 +32,10 @@ player1 = MCTS(
 env = gym.make('Chess-v0')
 env.reset()
 
-# Updates the player with the current board state, then computes the optimal move
+# Updates the player with the current board state
 player1.set_state(env)
+
+# Computes the optimal move given the current state
 move = player1.get_best_move()
 
 # Updates the environment with the chosen move
