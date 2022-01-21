@@ -12,7 +12,7 @@ The code was tested on python 3.9.
 
 ### Script
 The `mcts.py` script runs the algorithm on 10 rounds of chess. 
-Player1 uses MCTS with a pre-trained CNN model to evaluate board states. The model is trained on [this]!(https://www.kaggle.com/ronakbadhe/chess-evaluations) dataset to predict Stockfish evaluations of a given board state.
+Player1 uses MCTS with a pre-trained CNN model to evaluate board states. The model is trained on [this](https://www.kaggle.com/ronakbadhe/chess-evaluations) dataset to predict Stockfish evaluations of a given board state.
 Player2 uses Stockfish to choose its moves.
 Different simple players and rollout functions are defined in their respective folders. 
 They can be used with the defined MCTS interface.
