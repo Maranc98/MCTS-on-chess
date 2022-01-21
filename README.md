@@ -6,20 +6,37 @@ The code was tested on python 3.9.
 * Gym: `pip install gym`  
 * Gym chess: `pip install gym-chess`
 * Anytree: `pip install anytree` to build the MCTS tree and display it
+* Pytorch: 
+* Pytorch-lightning: `pip install pytorch-lightning` if you want to train and use the board evaluation model
 
 ### Script
-The `mcts.py` script runs the algorithm on 10 rounds of chess. 
+The `mcts.py` script runs the algorithm on 50 rounds of chess. 
+Player1 uses MCTS with a pre-trained CNN model to evaluate board states. The model is trained to predict Stockfish evaluations of a given board state using this [dataset]!(https://www.kaggle.com/ronakbadhe/chess-evaluations).
+Player2 uses Stockfish to choose its moves.
+Different simple players and rollout functions are defined in their respective folders. 
+They can be used with the defined MCTS interface.
+
+### Example of usage
 This is an example of a script to get the next best move as computed my MCTS:
 
 ```python
-# Assigns an environment to the algorithm to get legal moves for each iteration
-solver = MCTS(gym.make('Chess-v0'))
+# Defines the MCTS player with your choice of rollout function and parameters
+player1 = MCTS(
+    rollout_fn=RandomRollout(repeat_n=2),
+    max_steps=1000,
+    max_time=5
+)
 
-# Gets the next best move by computing MCTS steps for 10 seconds, for a max of 1000 steps
-move = solver.get_best_move(steps=1000, max_time=10)
+# Creates a chess gym environment
+env = gym.make('Chess-v0')
+env.reset()
 
-# Adds the chosen move to the MCTS model to update the new S0 accordingly
-solver.add_move(move)
+# Updates the player with the current board state, then computes the optimal move
+player1.set_state(env)
+move = player1.get_best_move()
+
+# Updates the environment with the chosen move
+env.step(move)
 ```
 
 After the time or steps cap is reached, the algorithm chooses which move to take.
